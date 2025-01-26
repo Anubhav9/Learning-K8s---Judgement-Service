@@ -15,7 +15,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
       - name: Set up Kubectl
-        run: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@v4
+        with:
+          version: default
       - name: Install AWS CLI
         run: |
           sudo apt-get update
