@@ -1,0 +1,36 @@
+name: Build Docker Image and Push to Docker Hub
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-image-push-to-docker-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Build Docker Image Locally
+        run: docker build -t judgement-service:v${{github.run_number}} .
+      - name: Tag Docker Image to Docker Hub
+        run: docker tag judgement-service:v${{github.run_number}} anubhav83/judgement-service:v${{github.run_number}}
+      - name: Authenticate Docker Hub Login
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.docker_hub_username }}
+          DOCKER_HUB_PASSWORD: ${{ secrets.docker_hub_token }}
+        run: docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+      - name: Push Image to Docker Hub
+        run: docker push anubhav83/judgement-service:v${{github.run_number}}
+      - name: Create a Tag
+        run: |
+          git tag v${{github.run_number}}
+          git push origin v${{github.run_number}}
+      - name: Create a Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v${{github.run_number}}
+          release_name: v${{github.run_number}}
+          body: Changes merged to main branch
+
+
+
+
