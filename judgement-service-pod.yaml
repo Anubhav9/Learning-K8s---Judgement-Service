@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: judgement-service
+  labels:
+    app: judgement-service
+spec:
+  containers:
+  - name: judgement-service
+    image: anubhav83/judgement-service:v3
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 3012
