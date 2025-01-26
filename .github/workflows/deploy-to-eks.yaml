@@ -1,6 +1,6 @@
 name: Deploy the latest master build to EKS
 on:
-  workflow-run:
+  workflow_run:
     workflows:
       - Build Docker Image and Push to Docker Hub
     types:
@@ -10,7 +10,7 @@ on:
       - main
 jobs:
   deploy_to_eks_when_pushed_to_master:
-    runs_on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
