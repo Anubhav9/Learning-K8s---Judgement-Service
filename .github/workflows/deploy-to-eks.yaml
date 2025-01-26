@@ -1,0 +1,35 @@
+name: Deploy the latest master build to EKS
+on:
+  workflow-run:
+    workflows:
+      - Build Docker Image and Push to Docker Hub
+    types:
+      - completed
+  push:
+    branches:
+      - main
+jobs:
+  deploy_to_eks_when_pushed_to_master:
+    runs_on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Set up Kubectl
+        run: azure/setup-kubectl@v4
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y aws-cli
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          region: ap-northeast-1
+      - name: Connect EKS Cluster to Kubectl
+        run:
+          aws eks update-kubeconfig --region ap-northeast-1 --name stg-env-cluster
+      - name: Apply the Config Files
+        run: |
+          kubectl apply -f judgement-service-pod.yaml
+          kubectl apply -f judgement-service-nodeport.yaml
